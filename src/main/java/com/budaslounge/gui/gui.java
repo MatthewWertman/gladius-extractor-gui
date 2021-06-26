@@ -7,6 +7,7 @@ import com.intellij.uiDesigner.core.Spacer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 
 public class gui extends JFrame {
     private JPanel MainPanel;
@@ -25,6 +26,13 @@ public class gui extends JFrame {
     private JRadioButton pakToolRadioButton;
     private JRadioButton tokToolRadioButton;
     private JRadioButton zlibToolRadioButton;
+    private JTextField txtSourceLocation;
+    private JButton btnSourceLocation;
+    private JTextField txtOutputLocation;
+    private JButton btnOutputLocation;
+    private JRadioButton packRadioButton;
+    private JRadioButton unpackRadioButton;
+    private ButtonGroup modeButtonGtp;
     private ButtonGroup archiveButtonGrp;
     private ButtonGroup isoButtonGrp;
 
@@ -37,21 +45,39 @@ public class gui extends JFrame {
                 splitPane.setDividerLocation(frameSize.width / 3);
             }
         });
-        gameVersionBox.addItemListener(itemEvent -> {
-            if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                if (itemEvent.getItem() == "GameCube") {
-                    psisoRadioButton.setEnabled(false);
-                    ngcisoRadioButton.setEnabled(true);
-                    ngcisoRadioButton.setSelected(true);
-                } else if (itemEvent.getItem() == "PlayStation") {
-                    ngcisoRadioButton.setEnabled(false);
-                    psisoRadioButton.setEnabled(true);
-                    psisoRadioButton.setSelected(true);
-                } else {
-                    psisoRadioButton.setEnabled(true);
-                    ngcisoRadioButton.setEnabled(true);
-                    isoButtonGrp.clearSelection();
-                }
+//        gameVersionBox.addItemListener(itemEvent -> {
+//            if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+//                if (itemEvent.getItem() == "GameCube") {
+//                    psisoRadioButton.setEnabled(false);
+//                    ngcisoRadioButton.setEnabled(true);
+//                    ngcisoRadioButton.setSelected(true);
+//                } else if (itemEvent.getItem() == "PlayStation") {
+//                    ngcisoRadioButton.setEnabled(false);
+//                    psisoRadioButton.setEnabled(true);
+//                    psisoRadioButton.setSelected(true);
+//                } else {
+//                    psisoRadioButton.setEnabled(true);
+//                    ngcisoRadioButton.setEnabled(true);
+//                    isoButtonGrp.clearSelection();
+//                }
+//            }
+//        });
+        btnSourceLocation.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                JFileChooser fc = new JFileChooser();
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fc.showOpenDialog(fc);
+                File file = fc.getSelectedFile();
+                txtSourceLocation.setText(file.getAbsolutePath());
+            }
+        });
+        btnOutputLocation.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                JFileChooser fc = new JFileChooser();
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                fc.showOpenDialog(fc);
+                File directory = fc.getSelectedFile();
+                txtOutputLocation.setText(directory.getAbsolutePath());
             }
         });
     }
@@ -84,16 +110,14 @@ public class gui extends JFrame {
         ConsolePane.setText("Console output goes here..");
         SplitPane.setRightComponent(ConsolePane);
         ActionPanel = new JPanel();
-        ActionPanel.setLayout(new GridLayoutManager(10, 2, new Insets(0, 0, 0, 0), -1, -1));
+        ActionPanel.setLayout(new GridLayoutManager(17, 2, new Insets(0, 0, 0, 0), -1, -1));
         SplitPane.setLeftComponent(ActionPanel);
-        final Spacer spacer1 = new Spacer();
-        ActionPanel.add(spacer1, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         gameVersionText = new JLabel();
         gameVersionText.setText("Game Version");
         ActionPanel.add(gameVersionText, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         runToolButton = new JButton();
         runToolButton.setText("Run Tool");
-        ActionPanel.add(runToolButton, new GridConstraints(9, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        ActionPanel.add(runToolButton, new GridConstraints(16, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         toolText = new JLabel();
         toolText.setText("Tools");
         ActionPanel.add(toolText, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(37, 33), null, 0, false));
@@ -128,6 +152,33 @@ public class gui extends JFrame {
         zlibToolRadioButton = new JRadioButton();
         zlibToolRadioButton.setText("Zlib Tool");
         ActionPanel.add(zlibToolRadioButton, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        ActionPanel.add(spacer1, new GridConstraints(15, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        txtSourceLocation = new JTextField();
+        txtSourceLocation.setEditable(false);
+        txtSourceLocation.setToolTipText("SourceDirectory");
+        ActionPanel.add(txtSourceLocation, new GridConstraints(11, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        btnSourceLocation = new JButton();
+        btnSourceLocation.setText("Find file to be extracted");
+        ActionPanel.add(btnSourceLocation, new GridConstraints(12, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        txtOutputLocation = new JTextField();
+        txtOutputLocation.setEditable(false);
+        ActionPanel.add(txtOutputLocation, new GridConstraints(13, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        btnOutputLocation = new JButton();
+        btnOutputLocation.setText("Choose output directory");
+        ActionPanel.add(btnOutputLocation, new GridConstraints(14, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label1 = new JLabel();
+        label1.setText("Mode");
+        ActionPanel.add(label1, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
+        unpackRadioButton = new JRadioButton();
+        unpackRadioButton.setSelected(true);
+        unpackRadioButton.setText("Unpack");
+        ActionPanel.add(unpackRadioButton, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        packRadioButton = new JRadioButton();
+        packRadioButton.setText("Pack");
+        ActionPanel.add(packRadioButton, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        ActionPanel.add(spacer2, new GridConstraints(10, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(-1, 20), null, 1, false));
         isoButtonGrp = new ButtonGroup();
         isoButtonGrp.add(ngcisoRadioButton);
         isoButtonGrp.add(psisoRadioButton);
@@ -136,6 +187,9 @@ public class gui extends JFrame {
         archiveButtonGrp.add(pakToolRadioButton);
         archiveButtonGrp.add(tokToolRadioButton);
         archiveButtonGrp.add(zlibToolRadioButton);
+        modeButtonGtp = new ButtonGroup();
+        modeButtonGtp.add(unpackRadioButton);
+        modeButtonGtp.add(packRadioButton);
     }
 
     /**
