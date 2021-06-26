@@ -1,5 +1,10 @@
 .DS_Store
 
+# idea project files
+
+.idea/
+Gladius-extractor-tool.iml
+
 # Compiled class file
 *.class
 
