@@ -8,5 +8,7 @@ How to make it work:
 2. Put it wherever you store your JimB python tools (it needs to be inside the tools folder)
 3. Run the .jar
 
-
-This now works with Windows!
+V1.2
+ - Now works in Windows!
+ - Added checkbox for GameCube version.
+ - Ensures GC compatibility when unpacking/packing BEC archive.
