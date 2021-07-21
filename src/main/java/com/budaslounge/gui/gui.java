@@ -152,7 +152,7 @@ public class gui {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(label, gbc);
 
-        rbNgcisoTool = new JRadioButton("Ngciso");
+        rbNgcisoTool = new JRadioButton("GC iso");
         isoSelectGrp.add(rbNgcisoTool);
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -162,7 +162,7 @@ public class gui {
         gbc.fill = GridBagConstraints.CENTER;
         panel.add(rbNgcisoTool, gbc);
 
-        rbPsisoTool = new JRadioButton("Psiso");
+        rbPsisoTool = new JRadioButton("PS iso");
         isoSelectGrp.add(rbPsisoTool);
         gbc.gridx = 1;  // place on second column
         gbc.gridy = 4;
