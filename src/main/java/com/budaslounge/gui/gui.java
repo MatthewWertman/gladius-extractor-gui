@@ -327,6 +327,15 @@ public class gui {
         gbc.anchor = GridBagConstraints.LAST_LINE_START;    // anchor component to bottom left corner
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(btnRunTool, gbc);
+
+        btnRunTool.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (rbModeUnpack.isSelected() && rbBecTool.isSelected()) {
+                    unpackBec(txtSourceLocation.getText(), txtOutputLocation.getText());
+                }
+            }
+        });
     }
 
     private static void createAndShowGUI() {
@@ -359,5 +368,52 @@ public class gui {
         }
 
         javax.swing.SwingUtilities.invokeLater(gui::createAndShowGUI);
+    }
+
+    public static void unpackBec(String src, String out) {
+        try{
+            String location = gui.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            int lastSlash = location.lastIndexOf("/");
+            if(System.getProperty("os.name").contains("Windows")){
+                location = location.substring(1, lastSlash+1);
+                src = src.replaceAll("/", "\\\\");
+                out = out.replaceAll("/", "\\\\");
+                location = location.replaceAll("/", "\\\\");
+            } else {
+                location = location.substring(0, lastSlash+1);
+            }
+            System.out.println(location);
+            String[] cmdArray = new String[7];
+            cmdArray[0] = "python";
+            cmdArray[1] = location + "bec-tool.py";
+            cmdArray[2] = "-unpack";
+            cmdArray[3] = src;
+            cmdArray[4] = out;
+            cmdArray[5] = "gladius_bec_FileList.txt";
+            boolean GC = cmbGameVersion.getSelectedItem().equals("GameCube");
+            if (GC) {
+                cmdArray[6] = "--gc";
+            } else {
+                cmdArray = Arrays.copyOf(cmdArray, 6);
+            }
+            Process process = Runtime.getRuntime().exec(cmdArray);
+            outputToConsole(process);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private static void outputToConsole(Process p) {
+        try {
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String output = "";
+            String s;
+            while ((s = stdInput.readLine()) != null) {
+                output = output.concat(s).concat("\n");
+            }
+            console.setText(output);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
