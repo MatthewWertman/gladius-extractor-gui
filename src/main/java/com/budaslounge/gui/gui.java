@@ -2,16 +2,18 @@ package com.budaslounge.gui;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
+import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
-import javax.swing.JLabel;
+import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JTextField;
 import javax.swing.JFileChooser;
-import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -23,7 +25,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class gui {
 
@@ -32,7 +38,8 @@ public class gui {
     // Reusable
     private static JPanel panel;
     private static JSplitPane splitPane;
-    private static JTextPane textPane;
+    private static JScrollPane scrollPane;
+    private static JTextPane console;
     private static JLabel label;
 
     private static JComboBox cmbGameVersion;
@@ -83,14 +90,20 @@ public class gui {
         pane.add(splitPane);
 
         // Create Console Pane
-        textPane = new JTextPane();
-        textPane.setEditable(false);
-        textPane.setText("Console output goes here..");
-        splitPane.setRightComponent(textPane);
+        console = new JTextPane();
+        console.setEditable(false);
+        console.setText("Console output goes here..");
+
+        // Create Scrollable pane
+        scrollPane = new JScrollPane();
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setViewportView(console);
+
+        splitPane.setRightComponent(scrollPane);
 
         /*
         *
-        Below we create what is called the "ActionPanel". This houses all of the selections and options on the left
+        Below we create what is called the "ActionPanel". This houses all the selections and options on the left
         side of the Split Pane.
         *
         The ActionPanel uses the GridBagLayout layout manager. It is the more sophisticated cousin of the GridLayout.
@@ -98,6 +111,7 @@ public class gui {
         *
         With the components defined below, this creates a 15 row, 2 column grid.
         */
+
         // Create ActionPanel
         panel = new JPanel();
         splitPane.setLeftComponent(panel);
@@ -120,7 +134,6 @@ public class gui {
         cmbGameVersion = new JComboBox();
         cmbGameVersion.setPreferredSize(new Dimension(125, 27));
         final DefaultComboBoxModel cmbGameVersionModel = new DefaultComboBoxModel();
-        cmbGameVersionModel.addElement("");
         cmbGameVersionModel.addElement("GameCube");
         cmbGameVersionModel.addElement("PlayStation");
         cmbGameVersion.setModel(cmbGameVersionModel);
