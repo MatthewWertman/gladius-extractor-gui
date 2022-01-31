@@ -345,9 +345,7 @@ public class gui {
         btnRunTool.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (rbModeUnpack.isSelected() && rbBecTool.isSelected()) {
-                    unpackBec(txtSourceLocation.getText(), txtOutputLocation.getText());
-                }
+                runAction(txtSourceLocation.getText(), txtOutputLocation.getText());
             }
         });
     }
@@ -384,7 +382,8 @@ public class gui {
         javax.swing.SwingUtilities.invokeLater(gui::createAndShowGUI);
     }
 
-    public static void unpackBec(String src, String out) {
+
+    private static void runAction(String srcLocation, String outLocation) {
         try{
             String location = gui.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             int lastSlash = location.lastIndexOf("/");
@@ -397,31 +396,43 @@ public class gui {
                 location = location.substring(0, lastSlash+1);
                 outLocation = outLocation + "/";
             }
-            System.out.println(location);
             String[] cmdArray = new String[7];
+            String consoleOut = "";
             cmdArray[0] = "python";
-            cmdArray[1] = location + "bec-tool.py";
-            cmdArray[2] = "-unpack";
-            cmdArray[3] = src;
-            cmdArray[4] = out;
-            cmdArray[5] = "gladius_bec_FileList.txt";
-            boolean GC = cmbGameVersion.getSelectedItem().equals("GameCube");
-            if (GC) {
-                cmdArray[6] = "--gc";
-            } else {
-                cmdArray = Arrays.copyOf(cmdArray, 6);
+            if (rbNgcisoTool.isSelected() && rbModeUnpack.isSelected()) {
+                String[] unpackIsoCmd = Arrays.copyOf(cmdArray, 6);
+                unpackIsoCmd[1] = location + "ngciso-tool.py";
+                unpackIsoCmd[2] = "-unpack";
+                unpackIsoCmd[3] = srcLocation;
+                unpackIsoCmd[4] = outLocation;
+                unpackIsoCmd[5] = "BaseISO_FileList.txt";
+                Process unpackingIso = Runtime.getRuntime().exec(unpackIsoCmd);
+                consoleOut = outputToConsole(unpackingIso, consoleOut);
+                if (rbBecTool.isSelected()) {
+                    // Extract bec archive after extracting iso
+                    cmdArray[1] = location + "bec-tool.py";
+                    cmdArray[2] = "-unpack";
+                    cmdArray[3] = outLocation + "gladius.bec";
+                    cmdArray[4] = outLocation + "gladius_bec/";
+                    cmdArray[5] = "gladius_bec_FileList.txt";
+                    boolean GC = cmbGameVersion.getSelectedItem().equals("GameCube");
+                    if (GC) {
+                        cmdArray[6] = "--gc";
+                    } else {
+                        cmdArray = Arrays.copyOf(cmdArray, 6);
+                    }
+                    Process unpackingBec = Runtime.getRuntime().exec(cmdArray);
+                    outputToConsole(unpackingBec, consoleOut);
+                }
             }
-            Process process = Runtime.getRuntime().exec(cmdArray);
-            outputToConsole(process);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private static void outputToConsole(Process p) {
+    private static String outputToConsole(Process p, String output) {
         try {
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String output = "";
             String s;
             while ((s = stdInput.readLine()) != null) {
                 output = output.concat(s).concat("\n");
@@ -430,5 +441,6 @@ public class gui {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return output;
     }
 }
