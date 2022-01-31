@@ -390,11 +390,12 @@ public class gui {
             int lastSlash = location.lastIndexOf("/");
             if(System.getProperty("os.name").contains("Windows")){
                 location = location.substring(1, lastSlash+1);
-                src = src.replaceAll("/", "\\\\");
-                out = out.replaceAll("/", "\\\\");
+                srcLocation = srcLocation.replaceAll("/", "\\\\");
+                outLocation = outLocation.replaceAll("/", "\\\\") + "\\\\";
                 location = location.replaceAll("/", "\\\\");
             } else {
                 location = location.substring(0, lastSlash+1);
+                outLocation = outLocation + "/";
             }
             System.out.println(location);
             String[] cmdArray = new String[7];
