@@ -177,6 +177,7 @@ public class gui {
 
         rbPsisoTool = new JRadioButton("PS iso");
         isoSelectGrp.add(rbPsisoTool);
+        rbPsisoTool.setEnabled(false);
         gbc.gridx = 1;  // place on second column
         gbc.gridy = 4;
         gbc.gridwidth = 1;
