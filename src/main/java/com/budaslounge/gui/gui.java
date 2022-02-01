@@ -7,6 +7,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
+import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
@@ -58,9 +59,27 @@ public class gui {
     private static JTextField txtOutputLocation;
 
     // Button Groups
-    private static final ButtonGroup isoSelectGrp = new ButtonGroup();
-    private static final ButtonGroup archiveSelectGrp = new ButtonGroup();
-    private static final ButtonGroup modeSelectGrp = new ButtonGroup();
+    //https://stackoverflow.com/questions/37598206/how-to-deselect-already-selected-jradiobutton-by-clicking-on-it
+    private static class selectiveRadioGroup extends ButtonGroup {
+        private ButtonModel prevModel;
+        private boolean isAdjusting = false;
+        @Override public void setSelected(ButtonModel m, boolean b) {
+            if (isAdjusting) {
+                return;
+            }
+            if (m.equals(prevModel)) {
+                isAdjusting = true;
+                clearSelection();
+                isAdjusting = false;
+            } else {
+                super.setSelected(m, b);
+            }
+            prevModel = getSelection();
+        }
+    }
+    private static final ButtonGroup isoSelectGrp = new selectiveRadioGroup();
+    private static final ButtonGroup archiveSelectGrp = new selectiveRadioGroup();
+    private static final ButtonGroup modeSelectGrp = new selectiveRadioGroup();
 
     // Fonts
     private static final Font headerFont = new Font("SansSerif", Font.BOLD, 14);
