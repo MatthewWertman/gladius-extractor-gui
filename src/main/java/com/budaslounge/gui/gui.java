@@ -415,38 +415,49 @@ public class gui {
                 location = location.substring(0, lastSlash+1);
                 outLocation = outLocation + "/";
             }
-            String[] cmdArray = new String[6];
+            String[] cmdArray;
             String consoleOut = "";
-            cmdArray[0] = "python";
             if (rbNgcisoTool.isSelected() && rbModeUnpack.isSelected()) {
-                cmdArray[1] = location + "ngciso-tool.py";
-                cmdArray[2] = "-unpack";
-                cmdArray[3] = srcLocation;
-                cmdArray[4] = outLocation;
-                cmdArray[5] = "BaseISO_FileList.txt";
+                cmdArray = buildCmdArr("ngciso-tool.py", location, srcLocation, outLocation, false);
                 Process unpackingIso = Runtime.getRuntime().exec(cmdArray);
                 consoleOut = outputToConsole(unpackingIso, consoleOut);
                 if (rbBecTool.isSelected()) {
                     // Extract bec archive after extracting iso
-                    cmdArray = Arrays.copyOf(cmdArray, 7);
-                    cmdArray[1] = location + "bec-tool.py";
-                    cmdArray[2] = "-unpack";
-                    cmdArray[3] = outLocation + "gladius.bec";
-                    cmdArray[4] = outLocation + "gladius_bec/";
-                    cmdArray[5] = "gladius_bec_FileList.txt";
-                    boolean GC = Objects.equals(cmbGameVersion.getSelectedItem(), "GameCube");
-                    if (GC) {
-                        cmdArray[6] = "--gc";
-                    } else {
-                        cmdArray = Arrays.copyOf(cmdArray, 6);
-                    }
+                   cmdArray = buildCmdArr("bec-tool.py", location, outLocation + "gladius.bec", outLocation + "gladius_bec/", false);
                     Process unpackingBec = Runtime.getRuntime().exec(cmdArray);
                     outputToConsole(unpackingBec, consoleOut);
                 }
+            } else if (rbBecTool.isSelected() && rbModeUnpack.isSelected()) {
+                cmdArray = buildCmdArr("bec-tool.py", location, srcLocation, outLocation, false);
+                Process unpackingBec = Runtime.getRuntime().exec(cmdArray);
+                outputToConsole(unpackingBec, consoleOut);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private static String[] buildCmdArr(String toolName, String l, String s, String o, boolean isModePack) {
+        String modeStr = "-unpack";
+        String fileListName = "";
+        if (isModePack) {
+            modeStr = "-pack";
+        }
+        String[] cmdArray = new String[6];
+        cmdArray[0] = "python";
+        cmdArray[1] = l + toolName;
+        cmdArray[2] = modeStr;
+        cmdArray[3] = s;
+        cmdArray[4] = o;
+        if (Objects.equals(toolName, "bec-tool.py")) {
+            cmdArray = Arrays.copyOf(cmdArray, 7);
+            fileListName = "gladius_bec_FileList.txt";
+            cmdArray[6] = "--gc";
+        } else if (Objects.equals(toolName, "ngciso-tool.py")) {
+            fileListName = "BaseISO_FileList.txt";
+        }
+        cmdArray[5] = fileListName;
+        return cmdArray;
     }
 
     private static String outputToConsole(Process p, String output) {
