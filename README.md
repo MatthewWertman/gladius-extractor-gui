@@ -11,3 +11,13 @@ How to make it work:
 This now works with Windows!
 
 MAKE SURE THAT THERE ARE NO SPACES IN ANY OF YOUR FILE PATHS OR IT WILL NOT WORK (currently fixing this but it's slow going)
+
+V1.2
+- Now works in Windows!
+- Added checkbox for GameCube version.
+- Ensures GC compatibility when unpacking/packing BEC archive.
+
+V1.3
+- New Cross-Platform GUI (WIP)
+- De-selectable radio buttons
+- Some tools can be "chained" (Currently, GC ISO and Bec)
