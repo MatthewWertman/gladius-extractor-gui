@@ -7,7 +7,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
-import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
@@ -22,15 +21,11 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Objects;
 
 public class gui {
 
@@ -59,24 +54,6 @@ public class gui {
     private static JTextField txtOutputLocation;
 
     // Button Groups
-    //https://stackoverflow.com/questions/37598206/how-to-deselect-already-selected-jradiobutton-by-clicking-on-it
-    private static class selectiveRadioGroup extends ButtonGroup {
-        private ButtonModel prevModel;
-        private boolean isAdjusting = false;
-        @Override public void setSelected(ButtonModel m, boolean b) {
-            if (isAdjusting) {
-                return;
-            }
-            if (m.equals(prevModel)) {
-                isAdjusting = true;
-                clearSelection();
-                isAdjusting = false;
-            } else {
-                super.setSelected(m, b);
-            }
-            prevModel = getSelection();
-        }
-    }
     private static final ButtonGroup isoSelectGrp = new selectiveRadioGroup();
     private static final ButtonGroup archiveSelectGrp = new selectiveRadioGroup();
     private static final ButtonGroup modeSelectGrp = new selectiveRadioGroup();
@@ -301,21 +278,18 @@ public class gui {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(btnSourceLoc, gbc);
 
-        btnSourceLoc.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JFileChooser fc = new JFileChooser();
-                if (rbModeUnpack.isSelected()) {
-                    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                    fc.showOpenDialog(fc);
-                    File file = fc.getSelectedFile();
-                    txtSourceLocation.setText(file.getAbsolutePath());
-                } else if (rbModePack.isSelected()) {
-                    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    fc.showOpenDialog(fc);
-                    File directory = fc.getSelectedFile();
-                    txtSourceLocation.setText(directory.getAbsolutePath());
-                }
+        btnSourceLoc.addActionListener(actionEvent -> {
+            JFileChooser fc = new JFileChooser();
+            if (rbModeUnpack.isSelected()) {
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fc.showOpenDialog(fc);
+                File file = fc.getSelectedFile();
+                txtSourceLocation.setText(file.getAbsolutePath());
+            } else if (rbModePack.isSelected()) {
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                fc.showOpenDialog(fc);
+                File directory = fc.getSelectedFile();
+                txtSourceLocation.setText(directory.getAbsolutePath());
             }
         });
 
@@ -336,15 +310,12 @@ public class gui {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(btnOutputLoc, gbc);
 
-        btnOutputLoc.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JFileChooser fc = new JFileChooser();
-                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fc.showOpenDialog(fc);
-                File directory = fc.getSelectedFile();
-                txtOutputLocation.setText(directory.getAbsolutePath());
-            }
+        btnOutputLoc.addActionListener(actionEvent -> {
+            JFileChooser fc = new JFileChooser();
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fc.showOpenDialog(fc);
+            File directory = fc.getSelectedFile();
+            txtOutputLocation.setText(directory.getAbsolutePath());
         });
 
         // Bottom button
@@ -361,12 +332,7 @@ public class gui {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(btnRunTool, gbc);
 
-        btnRunTool.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                runAction(txtSourceLocation.getText(), txtOutputLocation.getText());
-            }
-        });
+        btnRunTool.addActionListener(e -> runAction(txtSourceLocation.getText(), txtOutputLocation.getText()));
     }
 
     private static void createAndShowGUI() {
@@ -418,46 +384,23 @@ public class gui {
             String[] cmdArray;
             String consoleOut = "";
             if (rbNgcisoTool.isSelected() && rbModeUnpack.isSelected()) {
-                cmdArray = buildCmdArr("ngciso-tool.py", location, srcLocation, outLocation, false);
+                cmdArray = util.buildCmdArr("ngciso-tool.py", location, srcLocation, outLocation, false);
                 Process unpackingIso = Runtime.getRuntime().exec(cmdArray);
                 consoleOut = outputToConsole(unpackingIso, consoleOut);
                 if (rbBecTool.isSelected()) {
                     // Extract bec archive after extracting iso
-                   cmdArray = buildCmdArr("bec-tool.py", location, outLocation + "gladius.bec", outLocation + "gladius_bec/", false);
+                   cmdArray = util.buildCmdArr("bec-tool.py", location, outLocation + "gladius.bec", outLocation + "gladius_bec/", false);
                     Process unpackingBec = Runtime.getRuntime().exec(cmdArray);
                     outputToConsole(unpackingBec, consoleOut);
                 }
             } else if (rbBecTool.isSelected() && rbModeUnpack.isSelected()) {
-                cmdArray = buildCmdArr("bec-tool.py", location, srcLocation, outLocation, false);
+                cmdArray = util.buildCmdArr("bec-tool.py", location, srcLocation, outLocation, false);
                 Process unpackingBec = Runtime.getRuntime().exec(cmdArray);
                 outputToConsole(unpackingBec, consoleOut);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    private static String[] buildCmdArr(String toolName, String l, String s, String o, boolean isModePack) {
-        String modeStr = "-unpack";
-        String fileListName = "";
-        if (isModePack) {
-            modeStr = "-pack";
-        }
-        String[] cmdArray = new String[6];
-        cmdArray[0] = "python";
-        cmdArray[1] = l + toolName;
-        cmdArray[2] = modeStr;
-        cmdArray[3] = s;
-        cmdArray[4] = o;
-        if (Objects.equals(toolName, "bec-tool.py")) {
-            cmdArray = Arrays.copyOf(cmdArray, 7);
-            fileListName = "gladius_bec_FileList.txt";
-            cmdArray[6] = "--gc";
-        } else if (Objects.equals(toolName, "ngciso-tool.py")) {
-            fileListName = "BaseISO_FileList.txt";
-        }
-        cmdArray[5] = fileListName;
-        return cmdArray;
     }
 
     private static String outputToConsole(Process p, String output) {
