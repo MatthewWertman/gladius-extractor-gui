@@ -250,6 +250,11 @@ public class gui {
         gbc.fill = GridBagConstraints.CENTER;
         panel.add(rbModeUnpack, gbc);
 
+        rbModeUnpack.addActionListener(evt -> {
+            btnSourceLoc.setText("Find file to be extracted");
+            btnOutputLoc.setText("Choose output folder");
+        });
+
         rbModePack = new JRadioButton("Pack");
         modeSelectGrp.add(rbModePack);
         gbc.gridx = 1;
@@ -258,6 +263,11 @@ public class gui {
         gbc.weightx = 0.5;
         gbc.fill = GridBagConstraints.CENTER;
         panel.add(rbModePack, gbc);
+
+        rbModePack.addActionListener(evt -> {
+            btnSourceLoc.setText("Choose source directory");
+            btnOutputLoc.setText("Destination for output file");
+        });
 
         txtSourceLocation = new JTextField();
         txtSourceLocation.setEditable(false);
