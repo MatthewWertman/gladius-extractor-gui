@@ -391,22 +391,38 @@ public class gui {
                 location = location.substring(0, lastSlash+1);
                 outLocation = outLocation + "/";
             }
-            String[] cmdArray;
+            String[] cmdArray = new String[0];
             String consoleOut = "";
-            if (rbNgcisoTool.isSelected() && rbModeUnpack.isSelected()) {
-                cmdArray = util.buildCmdArr("ngciso-tool.py", location, srcLocation, outLocation, false);
-                Process unpackingIso = Runtime.getRuntime().exec(cmdArray);
-                consoleOut = outputToConsole(unpackingIso, consoleOut);
-                if (rbBecTool.isSelected()) {
-                    // Extract bec archive after extracting iso
-                   cmdArray = util.buildCmdArr("bec-tool.py", location, outLocation + "gladius.bec", outLocation + "gladius_bec/", false);
-                    Process unpackingBec = Runtime.getRuntime().exec(cmdArray);
-                    outputToConsole(unpackingBec, consoleOut);
+            if (rbNgcisoTool.isSelected()) {
+                if (rbModeUnpack.isSelected()) {
+                    cmdArray = util.buildCmdArr("ngciso-tool.py", location, srcLocation, outLocation, false);
+                    Process pNgcIsoTool = Runtime.getRuntime().exec(cmdArray);
+                    consoleOut = outputToConsole(pNgcIsoTool, consoleOut);
+                    if (rbBecTool.isSelected()) {
+                        // Extract bec archive after extracting iso
+                        Process pUnpackingBec = Runtime.getRuntime().exec(util.buildCmdArr("bec-tool.py", location, outLocation + "gladius.bec", outLocation + "gladius_bec/", false));
+                        outputToConsole(pUnpackingBec, consoleOut);
+                    }
+                } else if (rbModePack.isSelected()) {
+                    if (rbBecTool.isSelected()) {
+                        //Pack bec archive first
+                        Process pPackingBec = Runtime.getRuntime().exec(util.buildCmdArr("bec-tool.py", location,outLocation + "gladius_bec/", outLocation + "gladius.bec", true));
+                        outputToConsole(pPackingBec, consoleOut);
+                    }
+                    cmdArray = util.buildCmdArr("ngciso-tool.py", location, srcLocation, outLocation, true);
+                    Process pNgcIsoTool = Runtime.getRuntime().exec(cmdArray);
+                    consoleOut = outputToConsole(pNgcIsoTool, consoleOut);
                 }
-            } else if (rbBecTool.isSelected() && rbModeUnpack.isSelected()) {
-                cmdArray = util.buildCmdArr("bec-tool.py", location, srcLocation, outLocation, false);
-                Process unpackingBec = Runtime.getRuntime().exec(cmdArray);
-                outputToConsole(unpackingBec, consoleOut);
+            }
+            // if standalone
+            if (rbBecTool.isSelected() && ! rbNgcisoTool.isSelected()) {
+                if (rbModeUnpack.isSelected()) {
+                    cmdArray = util.buildCmdArr("bec-tool.py", location, srcLocation, outLocation, false);
+                } else if (rbModePack.isSelected()) {
+                    cmdArray = util.buildCmdArr("bec-tool.py", location, srcLocation, outLocation, true);
+                }
+                Process pBecTool = Runtime.getRuntime().exec(cmdArray);
+                outputToConsole(pBecTool, consoleOut);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
