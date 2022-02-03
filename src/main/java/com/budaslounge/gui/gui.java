@@ -62,7 +62,7 @@ public class gui {
     private static final Font headerFont = new Font("SansSerif", Font.BOLD, 14);
     private static final Font subHeaderFont = new Font("SansSerif", Font.BOLD, 13);
 
-    public static void addComponentsToPane(Container pane) {
+    private static void addComponentsToPane(Container pane) {
 
         // Set up content pane
         pane.setLayout(new GridLayout());       // Set layout to GridLayout

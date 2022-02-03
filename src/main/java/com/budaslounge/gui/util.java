@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class util {
-    protected static String[] buildCmdArr(String toolName, String l, String s, String o, boolean isModePack) {
+    static String[] buildCmdArr(String toolName, String l, String s, String o, boolean isModePack) {
         String modeStr = "-unpack";
         String fileListName;
         if (isModePack) {
