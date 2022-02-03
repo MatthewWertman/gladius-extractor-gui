@@ -38,7 +38,7 @@ public class gui {
     private static JTextPane console;
     private static JLabel label;
 
-    private static JComboBox cmbGameVersion;
+    private static JComboBox<String> cmbGameVersion;
     private static JButton btnSourceLoc;
     private static JButton btnOutputLoc;
     private static JButton btnRunTool;
@@ -127,9 +127,9 @@ public class gui {
         panel.add(label, gbc);
 
         // Game version combo box
-        cmbGameVersion = new JComboBox();
+        cmbGameVersion = new JComboBox<>();
         cmbGameVersion.setPreferredSize(new Dimension(125, 27));
-        final DefaultComboBoxModel cmbGameVersionModel = new DefaultComboBoxModel();
+        final DefaultComboBoxModel<String> cmbGameVersionModel = new DefaultComboBoxModel<>();
         cmbGameVersionModel.addElement("GameCube");
         cmbGameVersionModel.addElement("PlayStation");
         cmbGameVersion.setModel(cmbGameVersionModel);
