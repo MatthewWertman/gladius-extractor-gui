@@ -252,7 +252,7 @@ public class gui {
 
         rbModeUnpack.addActionListener(evt -> {
             btnSourceLoc.setText("Find file to be extracted");
-            btnOutputLoc.setText("Choose output folder");
+            btnOutputLoc.setText("Choose output directory");
         });
 
         rbModePack = new JRadioButton("Pack");
